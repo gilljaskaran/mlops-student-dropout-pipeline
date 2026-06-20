@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.venv/
+venv/
+*.egg-info/
+
+# DVC-tracked data & artifacts (kept out of git, versioned by DVC instead)
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+models/*
+!models/.gitkeep
+
+# MLflow local tracking store
+mlruns/
+mlflow.db
+
+# OS / editor
+.DS_Store
+.vscode/
+*.swp
+
+# misc
+*.log
