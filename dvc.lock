@@ -51,3 +51,30 @@ stages:
       hash: md5
       md5: 69fd35c92dfcf9717d8541ede2737ad3
       size: 33959793
+  evaluate:
+    cmd: python src/evaluate.py
+    deps:
+    - path: data/processed/test.csv
+      hash: md5
+      md5: 82df4409cd76a603bc27a53ca4e38c07
+      size: 100607
+    - path: models/model.pkl
+      hash: md5
+      md5: 69fd35c92dfcf9717d8541ede2737ad3
+      size: 33959793
+    - path: src/evaluate.py
+      hash: md5
+      md5: d98eba79fe3276f5fe1f037e123109ea
+      size: 2322
+    params:
+      params.yaml:
+        evaluate.average: macro
+    outs:
+    - path: docs/confusion_matrix.png
+      hash: md5
+      md5: 809246102015cabc18148b43015b6be3
+      size: 32659
+    - path: metrics.json
+      hash: md5
+      md5: 8fe332569eb6c31fd51e55f139b2c503
+      size: 572

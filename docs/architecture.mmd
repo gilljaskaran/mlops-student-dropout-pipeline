@@ -1,0 +1,20 @@
+flowchart LR
+    A[Raw data\nUCI dataset 697\ndata/raw/data.csv] -->|dvc stage: prepare| B[DVC prepare\nclean + encode + split]
+    B --> C[data/processed/\ntrain.csv, test.csv]
+    C -->|dvc stage: train| D[DVC train\nRandomForest]
+    D --> E[models/model.pkl]
+    E -->|dvc stage: evaluate| F[DVC evaluate\nmetrics + confusion matrix]
+    F --> G[metrics.json\ndocs/confusion_matrix.png]
+
+    C -.->|exploratory, outside dvc.yaml| H[MLflow tracking\nbaseline LR / RF grid / XGBoost grid]
+    H --> I[(mlruns/\nparams, metrics, model artifacts)]
+    I -.->|best run informs| D
+
+    subgraph GitHub
+        J[git commits] --> K[PR: data-pipeline]
+        J --> L[PR: experiment-tracking]
+        K --> M[main]
+        L --> M
+    end
+
+    B & D & F & H -.->|versioned via| J

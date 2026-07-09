@@ -24,3 +24,17 @@ stages:
       - train.random_state
     outs:
       - models/model.pkl
+
+  evaluate:
+    cmd: python src/evaluate.py
+    deps:
+      - src/evaluate.py
+      - models/model.pkl
+      - data/processed/test.csv
+    params:
+      - evaluate.average
+    metrics:
+      - metrics.json:
+          cache: false
+    outs:
+      - docs/confusion_matrix.png
