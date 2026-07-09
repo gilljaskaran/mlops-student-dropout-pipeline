@@ -1,0 +1,15 @@
+prepare:
+  test_size: 0.2
+  random_state: 42
+
+train:
+  # primary model that ends up as the "production" artifact for the DVC
+  # pipeline. Picked after comparing runs in MLflow (see experiment-tracking
+  # branch) -- random forest gave the best macro-F1 / training-time tradeoff.
+  n_estimators: 400
+  max_depth: 16
+  min_samples_leaf: 2
+  random_state: 42
+
+evaluate:
+  average: macro

@@ -1,0 +1,53 @@
+schema: '2.0'
+stages:
+  prepare:
+    cmd: python src/prepare.py
+    deps:
+    - path: data/raw/data.csv
+      hash: md5
+      md5: ee29c9ee9ea60654b5bb0a161c0a473d
+      size: 533230
+      isexec: true
+    - path: src/prepare.py
+      hash: md5
+      md5: b761a49f556861e74ca54a5d376e9e7f
+      size: 2689
+    params:
+      params.yaml:
+        prepare.random_state: 42
+        prepare.test_size: 0.2
+    outs:
+    - path: data/processed/label_map.json
+      hash: md5
+      md5: c326b1612d2754e1f07331e687755d8e
+      size: 52
+    - path: data/processed/test.csv
+      hash: md5
+      md5: 82df4409cd76a603bc27a53ca4e38c07
+      size: 100607
+    - path: data/processed/train.csv
+      hash: md5
+      md5: 70e03910c14aa96c950d7423f5d46f3f
+      size: 399520
+  train:
+    cmd: python src/train.py
+    deps:
+    - path: data/processed/train.csv
+      hash: md5
+      md5: 70e03910c14aa96c950d7423f5d46f3f
+      size: 399520
+    - path: src/train.py
+      hash: md5
+      md5: e07e3334b7c0e81d132f708dec1a841c
+      size: 1231
+    params:
+      params.yaml:
+        train.max_depth: 16
+        train.min_samples_leaf: 2
+        train.n_estimators: 400
+        train.random_state: 42
+    outs:
+    - path: models/model.pkl
+      hash: md5
+      md5: 69fd35c92dfcf9717d8541ede2737ad3
+      size: 33959793
