@@ -1,9 +1,5 @@
 # End-to-End MLOps Pipeline: Student Dropout Prediction
 
-**Team Members**
-- Eric Rathod
-- Jaskaran Gill
-
 Course project (P1, 12.5%) for the Master of AI Design & Development
 program. DVC-orchestrated pipeline (prepare -> train -> evaluate) with
 MLflow experiment tracking for model selection.
@@ -150,3 +146,7 @@ the other teammate before merge.
 ├── metrics.json                # dvc metric, tracked in git (small file)
 └── requirements.txt
 ```
+
+Team Members
+Eric Rathod
+Jaskaran Gill
