@@ -1,5 +1,9 @@
 # End-to-End MLOps Pipeline: Student Dropout Prediction
 
+**Team Members**
+- Eric Rathod
+- Jaskaran Gill
+
 Course project (P1, 12.5%) for the Master of AI Design & Development
 program. DVC-orchestrated pipeline (prepare -> train -> evaluate) with
 MLflow experiment tracking for model selection.
@@ -114,8 +118,8 @@ regenerate these locally.
 
 | Teammate  | Contributions |
 |-----------|----------------|
-| Jaskaran  | Repo skeleton & branch protection setup; dataset documentation (`docs/dataset.md`); DVC `prepare` stage (cleaning, encoding, stratified split); DVC `train` stage (RandomForest, `params.yaml` tuning); system architecture diagram; MLflow screenshot documentation |
-| Eric      | DVC `evaluate` stage (metrics, confusion matrix); MLflow experiment tracking (baseline LR, RF grid, XGBoost grid);  |
+| Jaskaran  | Implemented the repository setup and branch protection; documented the dataset (docs/dataset.md); implemented the DVC prepare stage (data cleaning, encoding, and stratified train/test split); implemented the DVC train stage (Random Forest training and params.yaml configuration); documented MLflow screenshots. |
+| Eric      | Implemented the DVC evaluate stage (metrics, confusion matrix, and evaluation artifacts); implemented MLflow experiment tracking (Logistic Regression baseline, Random Forest experiments, and XGBoost experiments); designed the system architecture diagram; performed model comparison and experiment analysis. |
 
 Both branches were opened as their own PR against `main` and reviewed by
 the other teammate before merge.
