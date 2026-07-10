@@ -114,8 +114,8 @@ regenerate these locally.
 
 | Teammate  | Contributions |
 |-----------|----------------|
-| Jaskaran  | Repo skeleton & branch protection setup; dataset documentation (`docs/dataset.md`); DVC `prepare` stage (cleaning, encoding, stratified split); DVC `train` stage (RandomForest, `params.yaml` tuning) |
-| Eric      | DVC `evaluate` stage (metrics, confusion matrix); MLflow experiment tracking (baseline LR, RF grid, XGBoost grid); system architecture diagram; MLflow screenshot documentation |
+| Jaskaran  | Repo skeleton & branch protection setup; dataset documentation (`docs/dataset.md`); DVC `prepare` stage (cleaning, encoding, stratified split); DVC `train` stage (RandomForest, `params.yaml` tuning); system architecture diagram; MLflow screenshot documentation |
+| Eric      | DVC `evaluate` stage (metrics, confusion matrix); MLflow experiment tracking (baseline LR, RF grid, XGBoost grid);  |
 
 Both branches were opened as their own PR against `main` and reviewed by
 the other teammate before merge.
