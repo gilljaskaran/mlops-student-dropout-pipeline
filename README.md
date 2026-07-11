@@ -149,4 +149,4 @@ the other teammate before merge.
 
 Team Members
 Eric Rathod
-Jaskaran Gill
+Jaskaran Singh
