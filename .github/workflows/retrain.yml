@@ -26,9 +26,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # evidently==0.7.21 (requirements-monitoring.txt) requires Python
+      # >=3.10, so this job needs a newer interpreter than ci.yml/Dockerfile
+      # use (3.9) -- those don't install evidently, so they're unaffected.
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.9"
+          python-version: "3.11"
 
       - name: Install dependencies
         run: |
