@@ -125,6 +125,7 @@ and support resources.
 | Approval | Jaskaran Singh (Project Lead), Eric Rathod (ML Lead) |
 | Last Review | 2026-08-02 |
 | Next Review | Before next academic term, or immediately if a drift/performance alert fires |
+| Live API | https://student-dropout-api-mo0v.onrender.com |
 
 **Where this card is stored:** this GitHub repository (version-controlled
 alongside the model), per Week 11's "Model Card in Practice" guidance. It
