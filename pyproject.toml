@@ -15,3 +15,10 @@ exclude = '''
 profile = "black"
 line_length = 100
 skip = [".venv", "venv", "mlruns", ".dvc"]
+
+[tool.pytest.ini_options]
+# Without this, `pytest tests/` (as opposed to `python -m pytest`) never adds
+# the repo root to sys.path, so `from app import main` fails with
+# ModuleNotFoundError in CI even though it works locally if you happen to
+# invoke it as `python -m pytest`. This makes both invocations equivalent.
+pythonpath = ["."]
