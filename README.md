@@ -141,7 +141,7 @@ Deployed with Render's free tier (`render.yaml`) -- see
 free-tier cold-start caveat, and alternatives (Hugging Face Spaces,
 Railway).
 
-**Live API:** `<add the Render URL here after deploying>`
+**Live API:** [`https://student-dropout-api-mo0v.onrender.com`](https://student-dropout-api-mo0v.onrender.com) ([`/docs`](https://student-dropout-api-mo0v.onrender.com/docs) for interactive Swagger UI; free tier cold-starts after 15 min idle)
 
 ### CI/CD
 
