@@ -1,0 +1,4 @@
+# Deps for src/monitor_drift.py / .github/workflows/retrain.yml.
+# Kept separate from requirements.txt (training) and requirements-api.txt
+# (serving) since monitoring isn't needed in either of those environments.
+evidently==0.7.21

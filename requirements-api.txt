@@ -1,0 +1,10 @@
+# Runtime deps for the FastAPI serving image (app/main.py).
+# Kept separate from requirements.txt (training/DVC/MLflow deps) so the
+# serving image stays slim -- see Week 8 "Containerization with Docker".
+fastapi==0.111.0
+uvicorn[standard]==0.30.1
+pydantic==2.7.4
+joblib==1.4.2
+scikit-learn==1.5.1
+pandas==2.2.2
+numpy==1.26.4

@@ -1,8 +1,10 @@
 # End-to-End MLOps Pipeline: Student Dropout Prediction
 
-Course project (P1, 12.5%) for the Master of AI Design & Development
-program. DVC-orchestrated pipeline (prepare -> train -> evaluate) with
-MLflow experiment tracking for model selection.
+Course project (MAI201 MLOps) for the Master of AI Design & Development
+program. Phase 1 (12.5%): DVC-orchestrated pipeline (prepare -> train ->
+evaluate) with MLflow experiment tracking for model selection. Phase 2
+(25%): FastAPI serving, Docker, CI/CD, drift monitoring, and automated
+retraining -- see below.
 
 ## Dataset
 
@@ -100,6 +102,77 @@ to actually go to production.
 See [`docs/mlflow-screenshots.md`](docs/mlflow-screenshots.md) for how to
 regenerate these locally.
 
+## Phase 2: Serving, CI/CD, and Monitoring
+
+**Read [`docs/deployment.md`](docs/deployment.md) first** -- Phase 1 never
+configured a DVC remote, so `models/model.pkl` and the processed data
+existed only in whoever's local `.dvc/cache`. Phase 2 changes those
+specific outputs to `cache: false` in `dvc.yaml` (same pattern already used
+for `metrics.json`) so they're tracked in git directly and a fresh clone
+(CI, Render, a teammate's machine) actually has what it needs. Run
+`dvc repro` and commit once before anything below will work.
+
+### API
+
+`app/main.py` -- FastAPI service, model-as-service pattern (Week 8). The
+request schema is generated from `model.feature_names_in_` at startup, so
+it can't drift out of sync with whatever `src/prepare.py` produces.
+
+```bash
+pip install -r requirements-api.txt
+uvicorn app.main:app --reload --port 8000   # http://localhost:8000/docs
+```
+
+Endpoints: `POST /predict`, `POST /predict/batch`, `GET /health`,
+`GET /model-info`, `GET /monitoring/recent-predictions`.
+
+### Docker
+
+```bash
+docker build -t dropout-api:latest .
+docker run -p 8000:8000 dropout-api:latest
+# or: docker compose up -d
+```
+
+### Deployment
+
+Deployed with Render's free tier (`render.yaml`) -- see
+[`docs/deployment.md`](docs/deployment.md) for the full walkthrough,
+free-tier cold-start caveat, and alternatives (Hugging Face Spaces,
+Railway).
+
+**Live API:** `<add the Render URL here after deploying>`
+
+### CI/CD
+
+- [`.github/workflows/ci.yml`](.github/workflows/ci.yml) -- lint
+  (flake8/black/isort on `app/` + `tests/`), `pytest` (synthetic fixtures,
+  no dependency on the real data/model), and a Docker build validation.
+- [`.github/workflows/cd.yml`](.github/workflows/cd.yml) -- triggers
+  Render's deploy hook, but only after `ci.yml` succeeds on `main`
+  (`render.yaml` has `autoDeploy: false` on purpose -- see Week 6/8 on
+  what "CI/CD for ML" actually means vs. deploy-on-every-push).
+
+### Monitoring & Continuous Training
+
+- [`src/monitor_drift.py`](src/monitor_drift.py) -- EvidentlyAI data drift
+  report (Week 9), reference = `data/processed/train.csv`.
+  ```bash
+  pip install -r requirements-monitoring.txt
+  python src/monitor_drift.py --simulate-drift   # demo mode
+  ```
+- [`src/check_retrain_trigger.py`](src/check_retrain_trigger.py) --
+  performance-based + data-based retraining triggers (Week 10).
+- [`.github/workflows/retrain.yml`](.github/workflows/retrain.yml) --
+  weekly cron + manual dispatch + data-change trigger. Retrains via
+  `dvc repro` only if a trigger fires, compares against the committed
+  baseline (`src/compare_metrics.py`), and opens a PR (never auto-merges --
+  branch protection still requires a review) if the new model is at least
+  as good.
+- [`docs/model_card.md`](docs/model_card.md) -- Model Card (Week 11),
+  including the fairness/bias-audit gap we're explicitly flagging as open,
+  not closed.
+
 ## Repo / branch workflow
 
 - `main` is protected: PR + 1 review required, no direct pushes (see
@@ -114,8 +187,8 @@ regenerate these locally.
 
 | Teammate  | Contributions |
 |-----------|----------------|
-| Jaskaran  | Repo skeleton & branch protection setup; dataset documentation (`docs/dataset.md`); DVC `prepare` stage (cleaning, encoding, stratified split); DVC `train` stage (RandomForest, `params.yaml` tuning) |
-| Eric      | DVC `evaluate` stage (metrics, confusion matrix); MLflow experiment tracking (baseline LR, RF grid, XGBoost grid); system architecture diagram; MLflow screenshot documentation |
+| Jaskaran  | Implemented the repository setup and branch protection; documented the dataset (docs/dataset.md); implemented the DVC prepare stage (data cleaning, encoding, and stratified train/test split); implemented the DVC train stage (Random Forest training and params.yaml configuration); documented MLflow screenshots. |
+| Eric      | Implemented the DVC evaluate stage (metrics, confusion matrix, and evaluation artifacts); implemented MLflow experiment tracking (Logistic Regression baseline, Random Forest experiments, and XGBoost experiments); designed the system architecture diagram; performed model comparison and experiment analysis. |
 
 Both branches were opened as their own PR against `main` and reviewed by
 the other teammate before merge.
@@ -125,24 +198,47 @@ the other teammate before merge.
 ```
 .
 ├── data/
-│   ├── raw/data.csv           # dvc-tracked (data/raw/data.csv.dvc)
-│   └── processed/             # dvc-tracked outputs of `prepare`
-├── models/model.pkl           # dvc-tracked output of `train`
+│   ├── raw/data.csv           # git-tracked (Phase 2) + dvc pointer (data.csv.dvc)
+│   └── processed/             # git-tracked (Phase 2), dvc.yaml outputs of `prepare`
+├── models/model.pkl           # git-tracked (Phase 2), dvc.yaml output of `train`
 ├── src/
 │   ├── prepare.py
 │   ├── train.py
 │   ├── evaluate.py
-│   └── train_mlflow.py
+│   ├── train_mlflow.py
+│   ├── monitor_drift.py        # Phase 2: EvidentlyAI drift report
+│   ├── check_retrain_trigger.py # Phase 2: performance + drift triggers
+│   └── compare_metrics.py      # Phase 2: model promotion check
+├── app/
+│   └── main.py                 # Phase 2: FastAPI serving
+├── tests/
+│   ├── conftest.py              # synthetic model fixture (no data dependency)
+│   ├── test_api.py
+│   └── test_data_quality.py
+├── monitoring/reports/          # Phase 2: drift report HTML + JSON summaries
 ├── docs/
 │   ├── dataset.md
 │   ├── architecture.mmd / architecture.png
 │   ├── branch-protection.md
 │   ├── mlflow-screenshots.md
+│   ├── deployment.md           # Phase 2
+│   ├── model_card.md           # Phase 2
 │   ├── confusion_matrix.png   # dvc-tracked
 │   └── screenshots/           # MLflow UI screenshots
 │       ├── experiment_comparison.png
 │       └── run_detail.png
+├── .github/workflows/
+│   ├── ci.yml                  # Phase 2: lint + test + docker build
+│   ├── cd.yml                  # Phase 2: deploy to Render after CI passes
+│   └── retrain.yml             # Phase 2: scheduled continuous training
+├── Dockerfile / docker-compose.yml / render.yaml   # Phase 2
 ├── dvc.yaml / dvc.lock / params.yaml
 ├── metrics.json                # dvc metric, tracked in git (small file)
-└── requirements.txt
+├── requirements.txt            # training/DVC/MLflow deps
+├── requirements-api.txt        # Phase 2: serving deps
+└── requirements-monitoring.txt # Phase 2: EvidentlyAI deps
 ```
+
+Team Members
+Eric Rathod
+Jaskaran Singh

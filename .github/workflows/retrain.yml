@@ -1,0 +1,109 @@
+name: Continuous Training
+
+# Three trigger types from Week 10, combined ("use multiple triggers, don't
+# rely on just one"):
+#   - schedule: time-based, weekly baseline check
+#   - workflow_dispatch: manual, for demos / on-demand runs
+#   - push on data.csv.dvc: data-based, so a new data version gets checked
+#     right away instead of waiting for the weekly run
+on:
+  schedule:
+    - cron: "0 6 * * 1" # every Monday 06:00 UTC
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+      - "data/raw/data.csv.dvc"
+      - "data/raw/data.csv"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  check-and-retrain:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install -r requirements-monitoring.txt
+
+      - name: Check prerequisites
+        id: prereq
+        run: |
+          if [ -f data/raw/data.csv ] && [ -f data/processed/train.csv ] \
+             && [ -f data/processed/test.csv ] && [ -f models/model.pkl ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::data/raw/data.csv, data/processed/*.csv, and/or models/model.pkl missing from this clone. This project has no DVC remote configured (see docs/deployment.md) -- commit them once and this workflow will run for real."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Drift check (data-based trigger)
+        if: steps.prereq.outputs.ready == 'true'
+        run: python src/monitor_drift.py
+
+      - name: Evaluate current model (performance-based trigger input)
+        if: steps.prereq.outputs.ready == 'true'
+        run: python src/evaluate.py
+
+      - name: Decide whether to retrain
+        id: decide
+        if: steps.prereq.outputs.ready == 'true'
+        run: |
+          set +e
+          python src/check_retrain_trigger.py
+          echo "retrain=$?" >> "$GITHUB_OUTPUT"
+          set -e
+
+      - name: Retrain (dvc repro)
+        if: steps.prereq.outputs.ready == 'true' && steps.decide.outputs.retrain == '1'
+        run: dvc repro
+
+      - name: Compare new metrics vs committed baseline
+        if: steps.prereq.outputs.ready == 'true' && steps.decide.outputs.retrain == '1'
+        id: compare
+        run: |
+          set +e
+          python src/compare_metrics.py
+          if [ $? -eq 0 ]; then echo "improved=true" >> "$GITHUB_OUTPUT"; else echo "improved=false" >> "$GITHUB_OUTPUT"; fi
+          set -e
+
+      # Model promotion (Week 10): only open a PR if the retrained model is
+      # at least as good as what's currently deployed. Never auto-merge --
+      # this repo's branch protection (docs/branch-protection.md) requires
+      # a human review before anything reaches main, which doubles as the
+      # "shadow/staging" gate from the CT pipeline diagram before rollout.
+      - name: Open PR with retrained model
+        if: steps.prereq.outputs.ready == 'true' && steps.decide.outputs.retrain == '1' && steps.compare.outputs.improved == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: "ci: retrain model (automated, triggered by drift/performance check)"
+          title: "Automated retrain: model update from Continuous Training workflow"
+          body: |
+            Opened automatically by `.github/workflows/retrain.yml`.
+
+            Triggered by: performance drop and/or data drift (see the
+            `check-and-retrain` job logs and `monitoring/reports/latest_drift_summary.json`
+            in this PR's diff).
+
+            New metrics are in `metrics.json`. Review the confusion matrix
+            (`docs/confusion_matrix.png`) before merging -- per
+            docs/branch-protection.md this still needs one approving review.
+          branch: automated/retrain-${{ github.run_number }}
+          add-paths: |
+            models/model.pkl
+            metrics.json
+            docs/confusion_matrix.png
+            monitoring/reports/latest_drift_summary.json
+
+      - name: No retrain needed
+        if: steps.prereq.outputs.ready == 'true' && steps.decide.outputs.retrain == '0'
+        run: echo "Performance and drift both within thresholds -- no retrain triggered this run."

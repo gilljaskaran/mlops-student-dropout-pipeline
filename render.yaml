@@ -1,0 +1,25 @@
+# Render Blueprint -- https://render.com/docs/blueprint-spec
+#
+# Deploys the FastAPI service (Dockerfile in repo root) as a free-tier web
+# service. Render was the platform recommended in Week 8 (free tier, Docker
+# support, automatic HTTPS, auto-deploy on git push).
+#
+# One-time setup (Render dashboard, not doable from this repo alone):
+#   1. New > Blueprint > connect this GitHub repo -> Render reads this file
+#      and creates the service below automatically.
+#   2. Or: New > Web Service > connect repo > Environment: Docker (skips
+#      this file, same result, just point it at ./Dockerfile).
+# See docs/deployment.md for the full walkthrough and the free-tier caveats
+# (spins down after 15 min idle, ~30-60s cold start on the next request).
+services:
+  - type: web
+    name: student-dropout-api
+    env: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    envVars:
+      - key: MODEL_VERSION
+        sync: false
+    autoDeploy: false  # deploy is gated by CI -- see .github/workflows/cd.yml

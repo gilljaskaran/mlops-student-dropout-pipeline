@@ -1,0 +1,17 @@
+[tool.black]
+line-length = 100
+target-version = ["py39"]
+exclude = '''
+/(
+    \.git
+  | \.venv
+  | venv
+  | mlruns
+  | \.dvc
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 100
+skip = [".venv", "venv", "mlruns", ".dvc"]

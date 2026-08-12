@@ -1,0 +1,31 @@
+# Local dev / single-host deployment. Mirrors the production-readiness
+# section of the Docker lab (resource limits, log rotation).
+version: '3.8'
+
+services:
+  api:
+    build: .
+    container_name: dropout-api
+    ports:
+      - "${API_PORT:-8000}:8000"
+    environment:
+      - MODEL_VERSION=${MODEL_VERSION:-}
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"

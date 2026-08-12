@@ -1,0 +1,27 @@
+name: CD - Deploy to Render
+
+# Deliberately NOT a plain `on: push` -- that would deploy even when tests
+# fail. Render's own autoDeploy is turned off (render.yaml) specifically so
+# this workflow_run gate is the only path to production. If CI fails,
+# nothing below runs and Render keeps serving whatever last deployed
+# successfully -- the simplest possible rollback (Week 8, Rollback Strategies).
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+    branches: [main]
+
+jobs:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Render deploy hook
+        run: |
+          if [ -z "${{ secrets.RENDER_DEPLOY_HOOK_URL }}" ]; then
+            echo "::warning::RENDER_DEPLOY_HOOK_URL secret not set -- add it once the Render service exists (docs/deployment.md)."
+            exit 0
+          fi
+          curl -fsS -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
+      - name: Summary
+        run: echo "Deploy hook triggered after CI success on main. Check the Render dashboard for build/deploy status."

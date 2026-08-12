@@ -8,9 +8,12 @@ stages:
       - prepare.test_size
       - prepare.random_state
     outs:
-      - data/processed/train.csv
-      - data/processed/test.csv
-      - data/processed/label_map.json
+      - data/processed/train.csv:
+          cache: false
+      - data/processed/test.csv:
+          cache: false
+      - data/processed/label_map.json:
+          cache: false
 
   train:
     cmd: python src/train.py
@@ -23,7 +26,8 @@ stages:
       - train.min_samples_leaf
       - train.random_state
     outs:
-      - models/model.pkl
+      - models/model.pkl:
+          cache: false
 
   evaluate:
     cmd: python src/evaluate.py

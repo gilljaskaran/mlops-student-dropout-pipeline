@@ -1,3 +1,6 @@
-/train.csv
-/test.csv
-/label_map.json
+# train.csv / test.csv / label_map.json are intentionally tracked in git
+# (Phase 2 change) -- dvc.yaml's `prepare` stage outputs use `cache: false`
+# now, same reasoning as models/.gitignore: no DVC remote is configured, so
+# a fresh clone (CI, monitoring workflows) had no way to get these
+# otherwise. dvc.lock still pins their hashes for reproducibility. See
+# docs/deployment.md.

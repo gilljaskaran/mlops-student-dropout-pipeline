@@ -1,1 +1,8 @@
-/data.csv
+# data.csv is intentionally tracked in git (Phase 2 change), in addition to
+# the DVC pointer file (data.csv.dvc) that already existed from Phase 1.
+# No DVC remote is configured, so `dvc pull` had nothing to pull from on a
+# fresh clone -- CI and the monitoring/retraining workflows need this file
+# to run `dvc repro` at all. It's small (~520 KB) and CC BY 4.0 licensed
+# (see docs/dataset.md), so committing it directly is a reasonable
+# tradeoff for a course project. See docs/deployment.md for the full
+# rationale and the "real DVC remote" alternative.

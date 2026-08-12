@@ -1,1 +1,12 @@
-/model.pkl
+# model.pkl is intentionally NOT ignored here (Phase 2 change).
+#
+# It was DVC-cached-only in Phase 1, which meant it lived only in whoever's
+# local .dvc/cache ran `dvc repro` -- no DVC remote is configured (see
+# .dvc/config), so a fresh clone (CI runner, Render, a teammate's machine)
+# had no way to obtain it. Since Docker/CI/Render all build straight from
+# the git clone, we changed dvc.yaml's train stage to `cache: false` for
+# this output (same pattern already used for metrics.json) so model.pkl is
+# tracked directly in git instead. dvc.lock still pins its hash for
+# reproducibility checks. See docs/deployment.md for the full rationale
+# and the "proper" alternative (a real DVC remote) if this project grows
+# past a course deployment.
