@@ -1,10 +1,28 @@
 # End-to-End MLOps Pipeline: Student Dropout Prediction
 
+[![CI](https://github.com/gilljaskaran/mlops-student-dropout-pipeline/actions/workflows/ci.yml/badge.svg)](https://github.com/gilljaskaran/mlops-student-dropout-pipeline/actions/workflows/ci.yml)
+[![CD - Deploy to Render](https://github.com/gilljaskaran/mlops-student-dropout-pipeline/actions/workflows/cd.yml/badge.svg)](https://github.com/gilljaskaran/mlops-student-dropout-pipeline/actions/workflows/cd.yml)
+[![Continuous Training](https://github.com/gilljaskaran/mlops-student-dropout-pipeline/actions/workflows/retrain.yml/badge.svg)](https://github.com/gilljaskaran/mlops-student-dropout-pipeline/actions/workflows/retrain.yml)
+[![Live API](https://img.shields.io/badge/Live%20API-student--dropout--api-brightgreen)](https://student-dropout-api-mo0v.onrender.com/docs)
+
 Course project (MAI201 MLOps) for the Master of AI Design & Development
 program. Phase 1 (12.5%): DVC-orchestrated pipeline (prepare -> train ->
 evaluate) with MLflow experiment tracking for model selection. Phase 2
 (25%): FastAPI serving, Docker, CI/CD, drift monitoring, and automated
 retraining -- see below.
+
+## For grading — quick links
+
+| Deliverable | Where |
+|---|---|
+| Live API (Swagger UI) | https://student-dropout-api-mo0v.onrender.com/docs |
+| Health check | https://student-dropout-api-mo0v.onrender.com/health |
+| CI/CD pipeline | [`.github/workflows/`](.github/workflows/) — [`ci.yml`](.github/workflows/ci.yml), [`cd.yml`](.github/workflows/cd.yml), [`retrain.yml`](.github/workflows/retrain.yml) |
+| Drift monitoring | [`src/monitor_drift.py`](src/monitor_drift.py), reports in [`monitoring/reports/`](monitoring/reports/) |
+| Model Card | [`docs/model_card.md`](docs/model_card.md) |
+| Deployment write-up | [`docs/deployment.md`](docs/deployment.md) |
+| Branching / PR workflow | [`docs/branch-protection.md`](docs/branch-protection.md), [Pull requests](https://github.com/gilljaskaran/mlops-student-dropout-pipeline/pulls?q=is%3Apr) |
+| Presentation slides | [`docs/presentation/MAI201_Phase2_Presentation.pptx`](docs/presentation/MAI201_Phase2_Presentation.pptx) |
 
 ## Dataset
 
