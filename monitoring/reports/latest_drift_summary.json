@@ -1,0 +1,11 @@
+{
+  "timestamp": "20260812T195553Z",
+  "reference": "data/processed/train.csv",
+  "current": "data/processed/test.csv",
+  "simulated_drift": true,
+  "dataset_drift": false,
+  "share_of_drifted_columns": 0.05555555555555555,
+  "number_of_drifted_columns": 2,
+  "number_of_columns": 36,
+  "report_html": "monitoring/reports/drift_report_20260812T195553Z.html"
+}
