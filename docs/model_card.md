@@ -122,8 +122,8 @@ and support resources.
 
 | | |
 |---|---|
-| Approval | Jaskaran Singh (Project Lead), Eric Rathod (ML Lead) |
-| Last Review | 2026-08-02 |
+| Approval | Jaskaran Singh, Eric Rathod  |
+| Last Review | 2026-08-08 |
 | Next Review | Before next academic term, or immediately if a drift/performance alert fires |
 | Live API | https://student-dropout-api-mo0v.onrender.com |
 
