@@ -6,9 +6,9 @@
 [![Live API](https://img.shields.io/badge/Live%20API-student--dropout--api-brightgreen)](https://student-dropout-api-mo0v.onrender.com/docs)
 
 Course project (MAI201 MLOps) for the Master of AI Design & Development
-program. Phase 1 (12.5%): DVC-orchestrated pipeline (prepare -> train ->
+program. Phase 1 : DVC-orchestrated pipeline (prepare -> train ->
 evaluate) with MLflow experiment tracking for model selection. Phase 2
-(25%): FastAPI serving, Docker, CI/CD, drift monitoring, and automated
+: FastAPI serving, Docker, CI/CD, drift monitoring, and automated
 retraining -- see below.
 
 ## For grading — quick links
