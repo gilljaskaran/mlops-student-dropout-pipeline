@@ -258,5 +258,5 @@ the other teammate before merge.
 ```
 
 Team Members
+Jaskaran Singh,
 Eric Rathod
-Jaskaran Singh
